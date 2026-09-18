@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: tiktok-account-monitor
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.13.7
+      - key: SECRET_KEY
+        generateValue: true
+      - key: SCRAPECREATORS_API_KEY
+        sync: false
+      - key: SCRAPECREATORS_CACHE_MAX_AGE
+        value: "1"

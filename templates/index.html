@@ -1,0 +1,22 @@
+<!doctype html><html lang="id"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>TikTok Account Monitor</title><link rel="stylesheet" href="{{ url_for('static',filename='style.css') }}"></head>
+<body><main><header><div><h1>📊 TikTok Account Monitor</h1><p>Posts • Following • Followers • Likes</p></div>
+<span class="badge {{'ok' if api_configured else 'bad'}}">{{'API siap' if api_configured else 'API belum dikonfigurasi'}}</span></header>
+{% with messages=get_flashed_messages() %}{% if messages %}<div class="flash">{{messages[-1]}}</div>{% endif %}{% endwith %}
+<section class="grid"><div class="card"><h2>Tambah akun</h2><form method="post" action="/accounts/add">
+<textarea name="usernames" placeholder="@akun1&#10;@akun2"></textarea><button>Tambah Akun</button></form></div>
+<div class="card"><h2>Import TXT/CSV</h2><form method="post" action="/accounts/upload" enctype="multipart/form-data">
+<input type="file" name="file" accept=".txt,.csv" required><button>Import File</button></form>
+<form method="post" action="/check-all"><button class="primary">Cek Semua Akun</button></form></div></section>
+<section class="card"><h2>Daftar Akun ({{accounts|length}})</h2><div class="table"><table><tr><th>Username</th><th>Ditambahkan</th><th></th></tr>
+{% for a in accounts %}<tr><td>@{{a.username}}</td><td>{{a.added_at}}</td><td><form method="post" action="/accounts/delete/{{a.username}}"><button class="danger">Hapus</button></form></td></tr>{% endfor %}
+</table></div></section>
+<section class="card"><div class="row"><h2>Statistik Terbaru</h2><div><a class="button" href="/export/latest.csv">CSV</a> <a class="button" href="/export/latest.xlsx">Excel</a></div></div>
+<div class="table"><table><tr><th>Username</th><th>Nama</th><th>Posts</th><th>Following</th><th>Followers</th><th>Likes</th><th>Checked</th><th>Status</th><th></th></tr>
+{% for x in latest %}<tr><td>@{{x.username}}</td><td>{{x.display_name or ''}}</td><td>{{x.posts if x.posts is not none else ''}}</td><td>{{x.following if x.following is not none else ''}}</td><td>{{x.followers if x.followers is not none else ''}}</td><td>{{x.likes if x.likes is not none else ''}}</td><td>{{x.checked_at}}</td><td>{{x.status}}</td><td><form method="post" action="/stats/delete/{{x.username}}"><button class="danger">Hapus</button></form></td></tr>{% endfor %}</table></div>
+<form method="post" action="/stats/reset" onsubmit="return confirm('Reset semua statistik dan riwayat?')"><button class="danger">Reset Semua Statistik</button></form></section>
+<section class="card"><div class="row"><h2>Riwayat</h2><div><a class="button" href="/export/history.csv">CSV</a> <a class="button" href="/export/history.xlsx">Excel</a></div></div>
+<div class="table"><table><tr><th>ID</th><th>Username</th><th>Nama</th><th>Posts</th><th>Following</th><th>Followers</th><th>Likes</th><th>Checked</th><th>Status</th></tr>
+{% for x in history %}<tr><td>{{x.id}}</td><td>@{{x.username}}</td><td>{{x.display_name or ''}}</td><td>{{x.posts if x.posts is not none else ''}}</td><td>{{x.following if x.following is not none else ''}}</td><td>{{x.followers if x.followers is not none else ''}}</td><td>{{x.likes if x.likes is not none else ''}}</td><td>{{x.checked_at}}</td><td>{{x.status}}</td></tr>{% endfor %}</table></div></section>
+</main></body></html>
